@@ -1,21 +1,5 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<style>
-
-body {
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	margin: 0 auto;
-	position: relative;
-	width: 960px;
-	background-color: #fff;
-	color: #000;
-}
-
-text {
-	font: 10px sans-serif;
-}
-
-</style>
 
 <script src="lib/d3.v3.min.js"></script>
 <script src="lib/moment.min.js"></script>
@@ -38,10 +22,10 @@ var
 	canvas,
 	riverData,
 	phasesData,
-	datam,
-	datas;
+	monthsData,
+	seasonsData;
 
-var datam = d3.json([
+var monthsData = [
 		{"days":31,"label":"Jan"},
 		{"days":29,"label":"Feb"},
 		{"days":31,"label":"Mar"},
@@ -54,9 +38,9 @@ var datam = d3.json([
 		{"days":31,"label":"Oct"},
 		{"days":30,"label":"Nov"},
 		{"days":31,"label":"Dez"}
-		]);
+		];
 
-var datas = d3.json([
+var seasonsData = d3.json([
 		{"size":1,"label":"Spring"},
 		{"size":1,"label":"Summer"},
 		{"size":1,"label":"Fall"},
@@ -110,9 +94,6 @@ function loadPhasesData(callback) {
 
 
 
-
-
-
 function initCanvas() {
 
 
@@ -120,7 +101,6 @@ function initCanvas() {
 
 	var rainToColor = d3.scale.linear().domain([0, 50]).range(["#f1f1f1", "#001580"]);
 	var levelToColor = d3.scale.linear().domain([0, 1500]).range(["#963", "#066"]);
-	var phasesToColor = d3.scale.category20c().domain(name);
 
 	// ARCS
 
@@ -142,11 +122,6 @@ function initCanvas() {
 						.startAngle(startAngle)
 						.endAngle(endAngle);
 
-		monthsPie = d3.layout.pie()
-						.value(function (d){ return d.days; })
-						.startAngle(startAngle)
-						.endAngle(endAngle);
-
 
 	canvas = d3.select("body")
 		 .append("svg")
@@ -160,11 +135,11 @@ function initCanvas() {
 
 	levelCanvas = canvas.append("g")
 	                  .attr("transform", "translate(480,480)")
-	                  .attr("class", "rain");
+	                  .attr("class", "river");
 
 	phasesCanvas = canvas.append("g")
 					  .attr("transform", "translate(480,480)")
-					  .attr("class", "fases");
+					  .attr("class", "phases");
 
 	monthsCanvas = canvas.append("g")
 					  .attr("transform", "translate(480,480)")
@@ -187,6 +162,7 @@ function initCanvas() {
         })
         .attr("stroke", "#FFF");
 
+
 	// Nível
 
 	var levelArcs = levelCanvas.selectAll(".arc")
@@ -204,8 +180,7 @@ function initCanvas() {
         .attr("stroke", "#FFF");
 
 
-	// FASES
-
+	// Phases
 
 	var phaseArcs = d3.svg.arc()
 		.startAngle(function(d){ return dateToRadians(d.start); })
@@ -223,15 +198,34 @@ function initCanvas() {
 
     phasesArcs.append("path")
         .attr("d", phaseArcs)
-        .attr("fill", phasesToColor)
-        .attr("class", function(d) { return d.uname; console.log(phasesData);})
-        .text(function(d) {
-        return d.name;
-    	});
-    	//.attr("fill","#FFF");
+        .attr("id", function(d) { return d.uname;})
+        .attr("class", "phasearc")
+        .attr("title", function(d) { return d.name;})
 
 
-	// MESES
+	var label = phasesArcs.append('text')
+	    .style('font-size', '8px')
+	    .style('color', '#FFF')
+	    .style('text-anchor', 'middle')
+	    .attr('dx', 0)
+	    .attr('dy', 18);
+
+
+	label.append('textPath')
+	    .attr('xlink:href', function(d) { return '#' + d.uname;})
+	    .attr("class", "label")
+	    .style('fill', '#FFF')
+	    .text(function(d) {
+	        return d.name;
+	    });
+
+
+	// Months
+
+		monthsPie = d3.layout.pie()
+						.value(monthsData, function (d){ return d.days; })
+						.startAngle(startAngle)
+						.endAngle(endAngle);
 
 	var monthArcs = d3.svg.arc()
 		.startAngle(function(d){ return dateToRadians(d.start); })
@@ -241,7 +235,7 @@ function initCanvas() {
 
 
 	var monthsArcs = monthsCanvas.selectAll(".arc")
-					.data([datam], function (d) { return d.days;})
+					.data([monthsData], function (d) { return d.days;})
 					//.key(d.days)
 					.enter()
 					.append("g")

@@ -1,103 +1,136 @@
-.ahsitaro {
+body {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	margin: 0 auto;
+	position: relative;
+	width: 960px;
+	background-color: #fff;
+	color: #000;
+}
+
+text {
+	font: 10px sans-serif;
+}
+
+
+/****  Fases ****/
+.phasearc {
+	opacity: 0.5;
+	color:#FFF;
+}
+
+.phasearc:hover {
+	opacity: 1;
+}
+
+.label {
+	opacity: 0.3;
+}
+
+.phasearc:hover .label {
+	opacity: 1;
+}
+
+
+#ahsitaro {
 	fill: #FFE680;
 }
 
-.nia-kuma {
+#nia-kuma {
 	fill: #FFC285;
 }
 
-.ana {
+#ana {
 	fill: #F0FFC2;
 }
 
-.ana-pihkoro {
+#ana-pihkoro {
 	fill: #E0FF85;
 }
 
-.ana-siokha {
+#ana-siokha {
 	fill: #D6FF5C;
 }
 
-.bihpia {
+#bihpia {
 	fill: #A3C266;
 }
 
-.dahsiu {
+#dahsiu {
 	fill: #FFCCCC;
 }
 
-.hia-diara-kuma {
+#hia-diara-kuma {
 	fill: #B2F0FF;
 }
 
-.hia-kuma {
+#hia-kuma {
 	fill: #80E6FF;
 }
 
-.hia-utaphea-keose-kuma {
+#hia-utaphea-keose-kuma {
 	fill: #4DDBFF;
 }
 
-.hia-yunari-kuma {
+#hia-yunari-kuma {
 	fill: #19D1FF;
 }
 
-.kare-kuma {
+#kare-kuma {
 	fill: #00B8E6;
 }
 
-.mere-kuma {
+#mere-kuma {
 	fill: #008FB2;
 }
 
-.muha {
+#muha {
 	fill: #B8B8FF;
 }
 
-.nia-kuma {
+#nia-kuma {
 	fill: #FFB2FF;
 }
 
-.nokoatero {
+#nokoatero {
 	fill: #C285C2;
 }
 
-.pamo {
+#pamo {
 	fill: #F3DAE6;
 }
 
-.pamo-oaduhka {
+#pamo-oaduhka {
 	fill: #C0A7B3;
 }
 
-.sararo-kuma {
+#sararo-kuma {
 	fill: #C2D6FF;
 }
 
-.sio-yahpu {
+#sio-yahpu {
 	fill: #A3C2FF;
 }
 
-.ure-kuma {
+#ure-kuma {
 	fill: #B2FFFF;
 }
 
-.wai-kahsa {
+#wai-kahsa {
 	fill: #FFE0E0;
 }
 
-.wamu-kuma {
+#wamu-kuma {
 	fill: #CCA3A3;
 }
 
-.yai {
+#yai {
 	fill: #FFE0A3;
 }
 
-.yhe {
+#yhe {
 	fill: #FFB2B2;
 }
 
-.yurara {
+#yurara {
 	fill: #FFE6E6;
 }
