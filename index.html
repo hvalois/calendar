@@ -24,29 +24,20 @@ var
 	canvas,
 	riverData,
 	phasesData,
-	monthsData,
+	//monthsData,
 	seasonsData;
-
-var monthsData = [
-		{"days":31,"label":"Jan"},
-		{"days":29,"label":"Feb"},
-		{"days":31,"label":"Mar"},
-		{"days":30,"label":"Apr"},
-		{"days":31,"label":"May"},
-		{"days":30,"label":"Jun"},
-		{"days":31,"label":"Jul"},
-		{"days":31,"label":"Aug"},
-		{"days":30,"label":"Sep"},
-		{"days":31,"label":"Oct"},
-		{"days":30,"label":"Nov"},
-		{"days":31,"label":"Dez"}
-		];
 
 var seasonsData = d3.json([
 		{"size":1,"label":"Spring"},
 		{"size":1,"label":"Summer"},
 		{"size":1,"label":"Fall"},
-		{"size":1,"label":"Winter"},
+		{"size":1,"label":"Winter"}
+		]);
+
+var years = d3.json([
+		{"id":1,"label":"2005-2006"},
+		{"id":2,"label":"2006-2007"},
+		{"id":3,"label":"2007-2008"}
 		]);
 
 // HELPER FUNCTIONS
@@ -56,7 +47,14 @@ function dateToRadians(date, isEnd) {
 	if (isEnd) {
 		numberOfDays = numberOfDays + 1;
 	}
-	return (2 * Math.PI * numberOfDays / totalDays);
+
+	angle = (2 * Math.PI * numberOfDays / totalDays);
+	if (angle > endAngle) 
+		return endAngle;
+	else if (angle < startAngle)
+		return startAngle;
+	else 
+		return angle;
 }
 
 
@@ -69,7 +67,8 @@ function loadRiverData(callback) {
 				key: d.dia,
 				nivel: parseFloat(d.nivel),
 				pluviometria: parseFloat(d.pluviometria),
-				value: parseFloat(d.valor)
+				value: parseFloat(d.valor),
+				fases: d.fases
 			}
 		}, function(err, data) {
 			riverData = data;
@@ -98,11 +97,10 @@ function loadPhasesData(callback) {
 
 function initCanvas() {
 
-
 	// COLOR SCALES
 
 	var rainToColor = d3.scale.linear().domain([0, 50]).range(["#f1f1f1", "#4D5BA6"]);
-	var levelToColor = d3.scale.linear().domain([0, 1500]).range(["#DBB84D", "#066"]);
+	var levelToColor = d3.scale.linear().domain([0, 1500]).range(["#FFDE5C", "#004C53"]);
 
 	// ARCS
 
@@ -112,7 +110,7 @@ function initCanvas() {
 
 	var rainArc = d3.svg.arc()
 		.innerRadius(280)
-		.outerRadius(290)
+		.outerRadius(305)
 
 
 	// RIVER ARCS
@@ -120,6 +118,7 @@ function initCanvas() {
 	var 
 		riverPie = d3.layout.pie()
 						.value(function (d){ return d.value; })
+						.sort(function(a,b){return a.date < b.date ? -1 : a.date > b.date ? 1 : 0;})
 						.startAngle(startAngle)
 						.endAngle(endAngle);
 
@@ -147,6 +146,33 @@ function initCanvas() {
 					  .attr("class", "months");
 
 
+	// Nível do Rio
+
+	var 
+		levelPie = d3.layout.pie()
+						.value(function (d){ return d.value; })
+						.startAngle(startAngle)
+						.sort(function(a,b){return a.date < b.date ? -1 : a.date > b.date ? 1 : 0;})
+						.endAngle(endAngle);
+
+
+	var levelArcs = levelCanvas.selectAll(".arc")
+					.data(levelPie(riverData))
+					.enter()
+					.append("g")
+					.attr("class", "arc");
+
+
+    levelArcs.append("path")
+        .attr("d", levelArc)
+        .attr("fill", function(d){ 
+        	return levelToColor(d.data.nivel); 
+        })
+        .attr("stroke", "#FFF")
+	        .append("rect")
+
+        ;
+
 	// Pluviometria
 
 	var rainArcs = rainCanvas.selectAll(".arc")
@@ -164,58 +190,30 @@ function initCanvas() {
         .attr("stroke", "#FFF");
 
 
-	// Nível
-
-	var levelArcs = levelCanvas.selectAll(".arc")
-					.data(riverPie(riverData))
-					.enter()
-					.append("g")
-					.attr("class", "arc");
-
-
-    levelArcs.append("path")
-        .attr("d", levelArc)
-        .attr("fill", function(d){ 
-        	return levelToColor(d.data.nivel); 
-        })
-        .attr("stroke", "#FFF");
-
 	// River Tooltips
 
-	var levelTip = d3.tip()
+	var dayTip = d3.tip()
 	  .attr('class', 'tooltip')
-	  .offset([0, -150])
+	  .offset([30, -140])
 	  .html(function(d) {
-	    return "<strong>Nível:</strong> <span style='color:#99D6FF'>" + d.data.nivel + "</span>";
+	    return "<span class='tip-year'>" + moment(d.data.date).format('YYYY') + "</span><span class='tip-date'>" + moment(d.data.date).format("MMM, DD") + "</span><span class='tip-week'>" + moment(d.data.date).format('ddd') + "</span><span class='tip-level'><strong>Nível do rio <sup>(cm)</sup>: </strong>" + d.data.nivel + "</span><span class='tip-rain'><strong>Pluviometria: </strong>" + d.data.pluviometria + "</span><span class='tip-fase'>" + d.data.fases + "</span>";
 	  });
 
-	var rainTip = d3.tip()
-	  .attr('class', 'tooltip')
-	  .offset([0, -150])
-	  .html(function(d) {
-	    return "<strong>Pluviometria:</strong> <span style='color:#99D6FF'>" + d.data.pluviometria + "</span>";
-	  });
-
-	levelCanvas.call(levelTip);
+	levelCanvas.call(dayTip);
 
 	levelCanvas.selectAll(".arc")
 	      .attr("width", 100)
 	      .attr("height", 120)
-	      .on('mouseover', levelTip.show)
-	      .on('mouseout', levelTip.hide);
+	      .on('mouseover', dayTip.show)
+	      .on('mouseout', dayTip.hide);
 
-	rainCanvas.call(rainTip);
+	rainCanvas.call(dayTip);
 
 	rainCanvas.selectAll(".arc")
 	      .attr("width", 100)
 	      .attr("height", 120)
-	      .on('mouseover', rainTip.show)
-	      .on('mouseout', rainTip.hide);
-
-	/*function type(d) {
-	  d.nivel = +d.nivel;
-	  return d;
-	}*/
+	      .on('mouseover', dayTip.show)
+	      .on('mouseout', dayTip.hide);
 
 
 	// Phases
@@ -223,8 +221,8 @@ function initCanvas() {
 	var phaseArcs = d3.svg.arc()
 		.startAngle(function(d){ return dateToRadians(d.start); })
 		.endAngle(function(d){ return dateToRadians(d.end, true);})
-		.innerRadius(300)
-		.outerRadius(330)
+		.innerRadius(310)
+		.outerRadius(340)
 
 
 	var phasesArcs = phasesCanvas.selectAll(".arc")
@@ -238,14 +236,14 @@ function initCanvas() {
         .attr("d", phaseArcs)
         .attr("id", function(d) { return d.uname;})
         .attr("class", "phasearc")
-        .attr("title", function(d) { return d.name;})
+        .attr("title", function(d) { return d.name;});
 
 
 	var label = phasesArcs.append('text')
 	    .style('font-size', '8px')
 	    .style('color', '#FFF')
-	    .style('text-anchor', 'middle')
-	    .attr('dx', startAngle + 5)
+	    //.style('text-anchor', 'middle')
+	    .attr('dx', [startAngle + 10])
 	    .attr('dy', 18);
 
 
@@ -259,7 +257,7 @@ function initCanvas() {
 
 	var phasesTip = d3.tip()
 	  .attr('class', 'tooltip')
-	  .offset([0, -150])
+	  .offset([0, -140])
 	  .html(function(d) {
 	    return "<strong><span style='color:#99D6FF'>" + d.name + "</span></strong>";
 	  });
@@ -273,32 +271,68 @@ function initCanvas() {
 	      .on('mouseout', phasesTip.hide);
 
 
-
 	// Months
 
-		monthsPie = d3.layout.pie()
-						.value([monthsData], function (d){ return d.days; })
-						.startAngle(startAngle)
-						.endAngle(endAngle);
+	function generateMonthsArc(){
 
-	var monthArcs = d3.svg.arc()
-		.startAngle(startAngle)
-		.endAngle(endAngle)
-		.innerRadius(155)
-		.outerRadius(185)
+		var months = [];
+
+		start = start_date;
+
+		do {
+			end = moment(start).endOf('month').format('YYYY-MM-DD');
+			name = moment(start).format('MMMM');
+			months.push({
+				start: start,
+				end: end, 
+				name: name,
+				startAngle: dateToRadians(start),
+				endAngle: dateToRadians(end, true)
+			});
+			start = moment(start).add(1, 'month').startOf('month').format('YYYY-MM-DD');
+		} while (start < end_date);
+
+		var monthArcs = d3.svg.arc()
+			.startAngle(function(d){return d.startAngle})
+			.endAngle(function(d){return d.endAngle})
+			.innerRadius(155)
+			.outerRadius(185)
 
 
-	var monthsArcs = monthsCanvas.selectAll(".arc")
-					.data([monthsData], function (d) { return d.days;})
-					//.key(d.days)
-					.enter()
-					.append("g")
-					.attr("class", "arc");
+		var monthsArcs = monthsCanvas.selectAll(".arc")
+						.data(months)
+						.enter()
+						.append("g")
+						.attr("class", "arc");
 
 
-    monthsArcs.append("path")
-        .attr("d", monthArcs)
-        .attr("fill", "#F1F1F1");
+	    monthsArcs.append("path")
+	        .attr("d", monthArcs)
+	        .attr("fill", "#eee")
+	        .attr("stroke","#FFF")
+	        .attr("stroke-width",2)
+	        .attr("id", function (d) { return d.name});
+	}
+
+	generateMonthsArc();
+
+	var label = monthsCanvas.selectAll(".arc").append('text')
+	    .style('font-size', '10px')
+	    //.style('font-weight', 'bolder')
+	    .style('color', '#FFF')
+	    //.style('text-align','center')
+	    .style('text-shadow','1px 1px 2px 2px 0.25')	    
+	    .attr('dx', [startAngle + 10])
+	    .attr('dy', 18);
+
+
+	label.append('textPath')
+	    .attr('xlink:href', function(d) { return '#' + d.name;})
+	    .attr("class", "label")
+	    .style('fill', '#FFF')
+	    .text(function(d) {
+	        return d.name;
+	    });
 
 }
 
@@ -310,8 +344,5 @@ loadRiverData(function(){
 		initCanvas();
 	})
 })
-
-
-
 
 </script>
