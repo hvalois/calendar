@@ -14,7 +14,7 @@ text {
 .tooltip {
   line-height: 1;
   padding: 8px;
-  font-size: 10px;
+  font-size: 12px;
   width:136px;
   background: rgba(0, 0, 0, 0.6);
   color: #fff;
@@ -25,10 +25,10 @@ text {
 .tooltip:after {
   box-sizing: border-box;
   display: inline;
-  font-size: 10px;
+  font-size: 15px;
   width: 100%;
   line-height: 1;
-  color: rgba(0, 0, 0, 0.8);
+  color: rgba(0, 0, 0, 0.6);
   content: "\25BC";
   position: absolute;
   text-align: center;
@@ -47,7 +47,7 @@ text {
 	height: 20px;
 	text-align: left;
 	line-height: 20px;
-	text-shadow: 1px 1px 4px rgba(0,0,0,0.25);	
+	text-shadow: 1px 1px 4px rgba(0,0,0,0.3);	
 }
 
 .tip-level, .tip-rain, .tip-fase {
@@ -85,21 +85,32 @@ text {
 }
 
 .tip-level, .tip-rain {
-	font-size: 12px;
+	font-size: 13px;
 	color:#F8F1DB;
 }
 
 .tip-level strong, .tip-rain strong {
-	font-size: 10px;
+	font-size: 11px;
 	color:#FFF;
 }
 
-.arc path {
+.tip-fase {
+	font-size: 10px;
+	color:#F8F1DB;
+	text-align: center;
+}
+
+.legend-box {
+	fill: none;
+}
+
+
+.rain .arc path, .river .arc path {
 	opacity: 1;
 }
 
-.arc:hover path {
-	opacity: 0.75;
+.rain .arc:hover path, .river .arc:hover path {
+	opacity: 0.5;
 }
 
 
@@ -107,6 +118,7 @@ text {
 .phasearc {
 	opacity: 0.5;
 	color:#FFF;
+	box-shadow: 0px 0px 3px rgba(0,0,0,0.5);
 }
 
 .phasearc:hover {
@@ -135,107 +147,92 @@ text {
 	opacity: 1;
 }
 
+/* * * Fases * * */
 
-#ahsitaro {
-	fill: #FFE680;
-}
+.ahsitaro { fill: #DEE6B1; }
 
-#nia-kuma {
-	fill: #FFC285;
-}
 
-#ana {
-	fill: #F0FFC2;
-}
 
-#ana-pihkoro {
-	fill: #E0FF85;
-}
+.ure-kuma {	fill: #DB5723; }
 
-#ana-siokha {
-	fill: #D6FF5C;
-}
+.use-kuma { fill: #D87930; }
 
-#bihpia {
-	fill: #A3C266;
-}
+.mere-kuma { fill: #D59A3E; }
 
-#dahsiu {
-	fill: #FFCCCC;
-}
+.wamu-kuma { fill: #D2BC4B; }
 
-#hia-diara-kuma {
-	fill: #B2F0FF;
-}
+.kare-kuma { fill: #CFDD59; }
 
-#hia-kuma {
-	fill: #80E6FF;
-}
+.sararo-kuma { fill: #CCFF66; }
 
-#hia-utaphea-keose-kuma {
-	fill: #4DDBFF;
-}
 
-#hia-yunari-kuma {
-	fill: #19D1FF;
-}
 
-#kare-kuma {
-	fill: #00B8E6;
-}
 
-#mere-kuma {
-	fill: #008FB2;
-}
+.nokoatero { fill: #6856A8; }
 
-#muha {
-	fill: #B8B8FF;
-}
+.wai-kahsa { fill: #2F43A0; }
 
-#nia-kuma {
-	fill: #FFB2FF;
-}
+.sio-yahpu { fill: #534FA5; }
 
-#nokoatero {
-	fill: #C285C2;
-}
+.sio-yahpu-wahtidhiaro { fill: #534FA5; }
 
-#pamo {
-	fill: #F3DAE6;
-}
 
-#pamo-oaduhka {
-	fill: #C0A7B3;
-}
 
-#sararo-kuma {
-	fill: #C2D6FF;
-}
+.ana { fill: #94FF78; }
 
-#sio-yahpu {
-	fill: #A3C2FF;
-}
+.ana-pihkoro { fill: #5CFF4A; }
 
-#ure-kuma {
-	fill: #B2FFFF;
-}
+.ana-siokha { fill: #CCFFA5; }
 
-#wai-kahsa {
-	fill: #FFE0E0;
-}
+.ana-ohpu { fill: #94FF78; }
 
-#wamu-kuma {
-	fill: #CCA3A3;
-}
+.ana-dieripa { fill: #94FF78; }
 
-#yai {
-	fill: #FFE0A3;
-}
 
-#yhe {
-	fill: #FFB2B2;
-}
 
-#yurara {
-	fill: #FFE6E6;
-}
+.hia-kuma, .nia-kuma { fill: #FFC17B; }
+
+.hia-utaphea-keose-kuma { fill: #FFB88E; }
+
+.hia-yunari-kuma { fill: #FFAEA2; }
+
+.hia-diara-kuma { fill: #FFA6B2; }
+
+
+
+.yai { fill: #FFF775; }
+
+.yai-siokha { fill: #FFF890; }
+
+.yai-ohpu { fill: #FFF890; }
+
+
+.pamo { fill: #F6B288; }
+
+.pamo-oaduhka { fill: #F0C4A1; }
+
+
+
+.bihpia { fill: #E0F0CC; }
+
+.namia-e-bihpia { fill: #8EA9BF; }
+
+
+
+.yhe { fill: #F2EAB8; }
+
+.yhe-pehtiro { fill: #DBD5A9; }
+
+
+
+.dahsiu { fill: #FACABB; }
+
+.muha { fill: #CDFABB; }
+
+.yurara { fill: #9DA372; }
+
+.sipe-phairo { fill: #ABCFED; }
+
+.yurara { fill: #9DA372; }
+
+.wuru-numuri { fill: #9DA372; }

@@ -18,14 +18,13 @@ var
 	radius = 480,
 	degrees_between_arc_limits = 5,
 	start_date = '2005-11-01',
-	end_date = '2008-10-31',
+	end_date = '2006-10-31',
 	startAngle = 2 * Math.PI * (degrees_between_arc_limits / 360) / 2,
 	endAngle = 2 * Math.PI * (1 - degrees_between_arc_limits / (360 * 2)),
 	totalDays = moment(end_date).diff(start_date, 'days')+1,
 	canvas,
 	riverData,
 	phasesData;
-
 
 // HELPER FUNCTIONS
 
@@ -47,7 +46,7 @@ function dateToRadians(date, isEnd) {
 
 function loadRiverData(callback) {
 	// load data from a CSV file
-	d3.csv('data/river.csv', 
+	d3.csv('data/river2005-2006.csv', 
 		function(d) {
 			return {
 				date: d.date,
@@ -87,7 +86,7 @@ function initCanvas() {
 	// COLOR SCALES
 
 	var rainToColor = d3.scale.linear().domain([0, 120]).range(["#f1f1f1", "#4D5BA6"]);
-	var levelToColor = d3.scale.linear().domain([0, 1500]).range(["#FFDE5C", "#004C53"]);
+	var levelToColor = d3.scale.linear().domain([0, 1200]).range(["#FFDE5C", "#004C53"]);
 
 	// ARCS
 
@@ -159,7 +158,10 @@ function initCanvas() {
         .attr("fill", function(d){ 
         	return levelToColor(d.data.nivel); 
         })
-        /*.attr("stroke", "#FFF")*/;
+        .attr("stroke", "#FFF")
+	        .append("rect")
+
+        ;
 
 	// Pluviometria
 
@@ -175,14 +177,14 @@ function initCanvas() {
         .attr("fill", function(d){ 
         	return rainToColor(d.data.pluviometria); 
         })
-        /*.attr("stroke", "#FFF")*/;
+        .attr("stroke", "#FFF");
 
 
 	// River Tooltips
 
 	var dayTip = d3.tip()
 	  .attr('class', 'tooltip')
-	  .offset([0, -175])
+	  .offset([0, -140])
 	  .html(function(d) {
 	    return "<span class='tip-year'>" + moment(d.data.date).format('YYYY') + "</span><span class='tip-date'>" + moment(d.data.date).format("MMM, DD") + "</span><span class='tip-week'>" + moment(d.data.date).format('ddd') + "</span><span class='tip-level'><strong>Nível do rio <sup>(cm)</sup>: </strong>" + d.data.nivel + "</span><span class='tip-rain'><strong>Pluviometria: </strong>" + d.data.pluviometria + "</span><span class='tip-fase'>" + d.data.fases + "</span>";
 	  });
@@ -245,9 +247,11 @@ function initCanvas() {
 	   legend = d3.select(".legends").append("g")
 		  .attr("class","legend")
 		  .attr("transform","translate(800,840)")
+		  .sort("null")
 		  .style("font-size","10px")
 		  .style("color","#FFF")
 		  .call(d3.legend);
+
 
 	// Months
 
@@ -259,7 +263,7 @@ function initCanvas() {
 
 		do {
 			end = moment(start).endOf('month').format('YYYY-MM-DD');
-			name = moment(start).format('MM');
+			name = moment(start).format('MMMM');
 			months.push({
 				start: start,
 				end: end, 
