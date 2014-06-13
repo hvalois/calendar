@@ -17,8 +17,8 @@ var
 	height = 1200,
 	radius = 480,
 	degrees_between_arc_limits = 5,
-	start_date = '2005-11-01',
-	end_date = '2008-10-31',
+	start_date = '2005-11-17',
+	end_date = '2006-10-31',
 	startAngle = 2 * Math.PI * (degrees_between_arc_limits / 360) / 2,
 	endAngle = 2 * Math.PI * (1 - degrees_between_arc_limits / (360 * 2)),
 	totalDays = moment(end_date).diff(start_date, 'days')+1,
@@ -49,14 +49,14 @@ function loadRiverData(callback) {
 	// load data from a CSV file
 	d3.csv('data/river.csv', 
 		function(d) {
-			return {
-				date: d.date,
-				//key: d.date,
-				value: parseFloat(d.date),
-				nivel: parseFloat(d.nivel),
-				pluviometria: parseFloat(d.pluviometria),
-				fases: d.fases
-			}
+			if(d.date >= start_date && d.date <= end_date)
+				return {
+					date: d.date,
+					value: parseFloat(d.date),
+					nivel: parseFloat(d.nivel),
+					pluviometria: parseFloat(d.pluviometria),
+					fases: d.fases
+				}
 		}, function(err, data) {
 			riverData = data;
 			callback();
@@ -95,6 +95,10 @@ function initCanvas() {
 		.innerRadius(radius - 245)
 		.outerRadius(radius - 130)
 
+	var levelSecondArc = d3.svg.arc()
+		.innerRadius(function (d) { return radius - 250 + parseFloat([d.data.nivel * 0.08]);})
+		.outerRadius(function (d) { return radius - 249 + parseFloat([d.data.nivel * 0.08]);})
+
 	var rainArc = d3.svg.arc()
 		.innerRadius(radius - 125)
 		.outerRadius(radius - 85)
@@ -128,6 +132,16 @@ function initCanvas() {
 	                  .attr("transform", "translate(480,480)")
 					  .attr("class", "phases");
 
+	skyCanvas = canvas.append("g")
+	                  .attr("transform", "translate(295,295)")
+					  .attr("class", "sky")
+					   .append("svg:image")
+	                   .attr("xlink:href", "constelacoes.png")
+	                   .attr("cx", 0)
+	                   .attr("cy", 0)
+	                   .attr("height", 370)
+	                   .attr("width", 370);
+
 	monthsCanvas = canvas.append("g")
 	                  .attr("transform", "translate(480,480)")
 					  .attr("class", "months");
@@ -135,7 +149,6 @@ function initCanvas() {
 	legendCanvas = canvas.append("g")
 	                  .attr("transform", "translate(0,0)")
 					  .attr("class", "legends");
-
 
 	// Nível do Rio
 
@@ -147,8 +160,15 @@ function initCanvas() {
 						.endAngle(endAngle);
 
 
+		levelSecondPie = d3.layout.pie()
+						.value(function (d){ return d.nivel; })
+						.startAngle(startAngle)
+						.sort(function(a,b){return a.date < b.date ? -1 : a.date > b.date ? 1 : 0;})
+						.endAngle(endAngle);
+
+
 	var levelArcs = levelCanvas.selectAll(".arc")
-					.data(levelPie(riverData))
+					.data(levelPie(riverData, [start_date,end_date]))
 					.enter()
 					.append("g")
 					.attr("class", "arc");
@@ -159,7 +179,20 @@ function initCanvas() {
         .attr("fill", function(d){ 
         	return levelToColor(d.data.nivel); 
         })
-        /*.attr("stroke", "#FFF")*/;
+        .attr("stroke", "#FFF")
+
+	levelArcs.append("g")
+			.attr("class", "secondArc")
+        	d3.selectAll(".secondArc").selectAll(".arc")
+			.data(levelSecondPie(riverData, [start_date,end_date]))
+				.enter()
+				.append("g")
+				.attr("class", "secondArcHolder");
+
+    d3.selectAll(".secondArcHolder").append("path")
+        	.attr("d", levelSecondArc)
+        	.attr("fill", "#FFF");
+
 
 	// Pluviometria
 
@@ -175,7 +208,7 @@ function initCanvas() {
         .attr("fill", function(d){ 
         	return rainToColor(d.data.pluviometria); 
         })
-        /*.attr("stroke", "#FFF")*/;
+;
 
 
 	// River Tooltips
@@ -310,6 +343,18 @@ function initCanvas() {
 	        return d.name;
 	    });
 
+    /*var axis = d3.svg.axis()
+    	.scale(levelToColor)
+    	.ticks(10);
+
+	d3.select("legends").append("g")
+    .attr("class", "axis")
+    .attr("width", 960)
+    .attr("height", 30)
+  	.append("g")
+    .attr("transform", "translate(0,30)")
+    .call(axis);*/
+
 }
 
 
@@ -322,3 +367,10 @@ loadRiverData(function(){
 })
 
 </script>
+
+<ul class="menu">
+	<li><a href="2005-2006.html">2005-2006</a></li>
+	<li><a href="2006-2007.html">2006-2007</a></li>
+	<li><a href="2007-2008.html">2007-2008</a></li>
+	<li><a href="index.html"><strong>2005-2006 V2</strong></a></li>
+</ul>

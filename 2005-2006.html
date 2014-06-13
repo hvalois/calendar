@@ -88,11 +88,19 @@ function initCanvas() {
 	var rainToColor = d3.scale.linear().domain([0, 120]).range(["#f1f1f1", "#4D5BA6"]);
 	var levelToColor = d3.scale.linear().domain([0, 1200]).range(["#FFDE5C", "#004C53"]);
 
+	// LEVEL SECOND SCALE
+
+	var levelTrace = d3.scale.linear().domain([0, 1500]).range(130, 245);
+
 	// ARCS
 
 	var levelArc = d3.svg.arc()
 		.innerRadius(radius - 245)
 		.outerRadius(radius - 130)
+
+	var levelSecondArc = d3.svg.arc()
+		.innerRadius(radius - 245  - function(d) { return levelTrace(d.data.nivel); })
+		.outerRadius(radius - 130 + function(d) { return levelTrace(d.data.nivel) + 5; })
 
 	var rainArc = d3.svg.arc()
 		.innerRadius(radius - 125)
@@ -131,6 +139,16 @@ function initCanvas() {
 	                  .attr("transform", "translate(480,480)")
 					  .attr("class", "months");
 
+	skyCanvas = canvas.append("g")
+	                  .attr("transform", "translate(295,295)")
+					  .attr("class", "sky")
+					   .append("svg:image")
+	                   .attr("xlink:href", "constelacoes.png")
+	                   .attr("cx", 0)
+	                   .attr("cy", 0)
+	                   .attr("height", 370)
+	                   .attr("width", 370);
+
 	legendCanvas = canvas.append("g")
 	                  .attr("transform", "translate(0,0)")
 					  .attr("class", "legends");
@@ -158,10 +176,22 @@ function initCanvas() {
         .attr("fill", function(d){ 
         	return levelToColor(d.data.nivel); 
         })
-        .attr("stroke", "#FFF")
-	        .append("rect")
+        .append("arc")
+	        .attr("d", levelSecondArc)
+        	/*.outerRadius(function(d){ 
+        	return 245 - d.data.nivel / 10; 
+        	})
+        	.innerRadius(function(d){ 
+        	return 245 - d.data.nivel / 10 + 5; 
+        	})*/
+        	//.attr("height",15)
+        	//.attr("width",15)
+        	.attr("fill","#FFF")
+        	/*.attr("cx", 
+        .attr("cy", function(d){ 
+        	return d.data.nivel / 10 + 40; 
+        })*//*.attr("stroke", "#FFF")*/;
 
-        ;
 
 	// Pluviometria
 
@@ -326,3 +356,10 @@ loadRiverData(function(){
 })
 
 </script>
+
+<ul class="menu">
+	<li><a href="2005-2006.html">2005-2006</a></li>
+	<li><a href="2006-2007.html">2006-2007</a></li>
+	<li><a href="2007-2008.html">2007-2008</a></li>
+	<li><a href="index.html"><strong>2005-2006 V2</strong></a></li>
+</ul>

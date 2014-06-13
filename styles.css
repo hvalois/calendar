@@ -147,6 +147,19 @@ text {
 	opacity: 1;
 }
 
+.menu {
+	list-style: none;
+	width: 960px;
+	height: 60px;
+	margin: 20px auto;
+}
+
+.menu li {
+	width: 210px;
+	float: left;
+	text-align: center;
+}
+
 /* * * Fases * * */
 
 .ahsitaro { fill: #DEE6B1; }
